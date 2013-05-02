@@ -53,6 +53,7 @@ class PoolTest extends FunSpec {
       assert(r1.next())
       assert(r1.getInt(1).equals(1))
       assert(r1.getString(2).equals("foo"))
+      r1.close() // Does this close the statement?
     }
   }
 

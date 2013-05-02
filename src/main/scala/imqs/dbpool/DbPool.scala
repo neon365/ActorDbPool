@@ -70,6 +70,10 @@ object DbPool {
   /**
    * Create a router (actor) to access the database pool. It will create the required number of connections
    * and dispatch any requests (formulated as futures) to the next member of the pool to execute the query.
+   * Sending the actor an @see Update results in an integer return. For a @see Query, a JDBC ResultSet is
+   * returned. In the case of an @see Execute message, a Boolean is returned. These messages correspond to
+   * calls to execute(), executeQuery() and executeUpdate() calls on a Statement object. In the case of a
+   * ResultSet being returned, it is the responsibility of the calling actor to close the statement.
    * The results are returned as a ResultSet as is standard for JDBC.
    * TODO: Make this a future rather than an actor style call
    * @param system The actor system
