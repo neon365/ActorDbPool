@@ -1,8 +1,7 @@
 package imqs.dbpool
 
-import java.sql.{DriverManager, ResultSet, Connection}
+import java.sql.{DriverManager,Connection}
 import akka.actor._
-import scala.Some
 import akka.routing.RoundRobinRouter
 
 /**
@@ -42,20 +41,15 @@ private class PoolActor (detail: DbDetails ) extends Actor with ActorLogging {
   def receive = {
     case s: Execute =>
       val statement = connection.createStatement()
-      val result: Boolean =statement.execute(s.statement)
+      sender ! statement.execute(s.statement) // Boolean
       statement.close()
-      sender ! result // Boolean
     case s: Query =>
       val statement = connection.createStatement()
-      val result: ResultSet =statement.executeQuery(s.statement)
-      statement.close()
-      sender ! result // ResultSet
+      sender ! statement.executeQuery(s.statement) // ResultSet
     case s: Update =>
       val statement = connection.createStatement()
-      val result: Int =statement.executeUpdate(s.statement)
+      sender ! statement.executeUpdate(s.statement) // Int
       statement.close()
-      sender ! result // Int
-    case u: Update => sender ! Some[String](s"Not implemented: Statement was ${u.statement}")
     case Status => sender ! self.path.name
     case x => log.error(s"Invalid message type in PoolActor: ${x.getClass}")
   }
