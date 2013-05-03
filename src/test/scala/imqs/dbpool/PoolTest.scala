@@ -32,10 +32,12 @@ class PoolTest extends FunSpec {
       // Set should contain "size" unique entries
       assert(s.size == size)
 
+      // Check that the database is actually there
       val cf = for (i ← 1 to 2*size) yield test ? Query("help")
-      for (f <- cf ) {}
-        val res = Await.result(test ? Query("help"),5 seconds).asInstanceOf[ResultSet]
+      for (f <- cf ) {
+        val res = Await.result(f ,5 seconds).asInstanceOf[ResultSet]
         assert(res.next())
+      }
     }
   }
 
@@ -56,5 +58,4 @@ class PoolTest extends FunSpec {
       r1.close() // Does this close the statement?
     }
   }
-
 }
