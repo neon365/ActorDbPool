@@ -12,7 +12,7 @@ import ExecutionContext.Implicits.global
  * Date: 2013/04/30
  * Time: 1:38 PM
  */
-object H2test extends App {
+object PoolExample extends App {
 
   Class.forName("org.h2.Driver").newInstance()
   val db = DbDetails("jdbc:h2:mem:test_fu","","")
