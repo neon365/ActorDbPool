@@ -7,6 +7,8 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
+
 /**
  * User: weber
  * Date: 2013/04/30
@@ -23,13 +25,14 @@ object PoolExample extends App {
   // Returns a list of all  the functions available in H2
   val future = pool ? Query("help")
 
-  future onSuccess {
-    case res: ResultSet =>
-      while(res.next) {
-        print(res.getString(3) + ", ")
-      }
-      println("\nCompleted")
+  future onComplete {
+    case Success(res: ResultSet) =>
+      while (res.next()) print(res.getString(3) + ", ")
+      println("\nRequest completed!")
+    case Failure(error) =>
+      println("Query failed: " + error)
   }
+
   println("Pool request dispatched")
   Thread.sleep(1000)
   system.shutdown()
