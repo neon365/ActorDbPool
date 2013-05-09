@@ -17,7 +17,8 @@ object PoolExample extends App {
   Class.forName("org.h2.Driver").newInstance()
   val db = DbDetails("jdbc:h2:mem:test_fu","","")
   implicit val timeout = Timeout(5 seconds)
-  val pool = DbPool(ActorSystem("DbPool"),2,db)
+  implicit val system = ActorSystem("DbPool")
+  val pool = DbPool(system,2,db)
 
   // Returns a list of all  the functions available in H2
   val future = pool ? Query("help")
@@ -27,6 +28,9 @@ object PoolExample extends App {
       while(res.next) {
         print(res.getString(3) + ", ")
       }
-      println()
+      println("\nCompleted")
   }
+  println("Pool request dispatched")
+  Thread.sleep(1000)
+  system.shutdown()
 }
