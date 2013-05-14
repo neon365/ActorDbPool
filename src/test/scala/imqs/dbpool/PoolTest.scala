@@ -33,6 +33,14 @@ class PoolTest extends FunSpec {
       }
       // Set should contain "size" unique entries
       assert(s.size == size)
+    }
+  }
+
+  describe("Database connections") {
+    it("should create pool of N database connections") {
+      val size = 5
+      val actorSystem = ActorSystem("DbPool")
+      val test = DbPool(actorSystem,size,db)
 
       // Check that the database is actually there
       val cf = for (i ← 1 to 2*size) yield test ? Query("help")
