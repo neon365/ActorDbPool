@@ -26,8 +26,10 @@ class PoolTest extends FunSpec {
 
       val s = collection.mutable.Set[String]()
       for (f <- futures) {
-        val res = Await.result(f,1 second).asInstanceOf[String]
-        s.add(res)
+       Await.result(f,1 second) match {
+         case res: String => s.add(res)
+         case _ => fail("Actor can only return a string if it is sent a status message")
+       }
       }
       // Set should contain "size" unique entries
       assert(s.size == size)
@@ -35,8 +37,10 @@ class PoolTest extends FunSpec {
       // Check that the database is actually there
       val cf = for (i ← 1 to 2*size) yield test ? Query("help")
       for (f <- cf ) {
-        val res = Await.result(f ,5 seconds).asInstanceOf[ResultSet]
-        assert(res.next())
+        Await.result(f ,5 seconds) match {
+          case res: ResultSet => assert(res.next())
+          case _ => fail("Actor must return a result set for the query")
+        }
       }
     }
   }
@@ -45,17 +49,26 @@ class PoolTest extends FunSpec {
     it("should create a table, populate it and check that the DB was correctly populated") {
       val test = DbPool(ActorSystem("DbPool"),2,db)
       val f0 = test ? Execute("create table test (id int, name varchar)")
-      val r0 = Await.result(f0,1 seconds).asInstanceOf[Boolean]
-      assert(!r0) // Only true if there was a ResultSet returned
+      Await.result(f0,1 seconds) match {
+        case r: Boolean => assert(!r)
+        case _ =>fail("Only true if there was a ResultSet returned")
+      }
+
       val f1 = test ? Update("insert into test values(1,'foo')")
-      val count = Await.result(f1,1 seconds).asInstanceOf[Int]
-      assert(count == 1)
+      Await.result(f1,1 seconds) match {
+        case count: Int => assert(count == 1)
+        case _ => fail("Updates can only return a boolean")
+      }
+
       val f2 = test ? Query("select id,name from test")
-      val r1 = Await.result(f2,1 seconds).asInstanceOf[ResultSet]
-      assert(r1.next())
-      assert(r1.getInt(1).equals(1))
-      assert(r1.getString(2).equals("foo"))
-      r1.close() // Does this close the statement?
+      Await.result(f2,1 seconds) match {
+        case r: ResultSet =>
+          assert(r.next())
+          assert(r.getInt(1).equals(1))
+          assert(r.getString(2).equals("foo"))
+          r.close() // Does this close the statement?
+        case _ => fail("Query must return a ResultSet")
+      }
     }
   }
 }
