@@ -8,6 +8,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
+import scala.language.postfixOps
 
 /**
  * User: weber
@@ -31,6 +32,7 @@ object PoolExample extends App {
       println("\nRequest completed!")
     case Failure(error) =>
       println("Query failed: " + error)
+    case _ => println("Unknown type received")
   }
 
   println("Pool request dispatched")
