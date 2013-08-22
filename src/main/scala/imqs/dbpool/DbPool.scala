@@ -39,20 +39,20 @@ private class PoolActor (detail: DbDetails ) extends Actor with ActorLogging {
   }
 
   def receive = {
-    case s: Execute =>
+    case Execute(sql: String) =>
       val statement = connection.createStatement()
-      sender ! statement.execute(s.statement) // Boolean
+      sender ! statement.execute(sql) // Boolean
       statement.close()
-      log.info(s"Execute('${s.statement}') completed" )
-    case s: Query =>
+      log.info(s"Execute('$sql') completed" )
+    case Query(sql: String) =>
       val statement = connection.createStatement()
-      sender ! statement.executeQuery(s.statement) // ResultSet
-      log.info(s"Query('${s.statement}') completed" )
-    case s: Update =>
+      sender ! statement.executeQuery(sql) // ResultSet
+      log.info(s"Query('$sql') completed" )
+    case Update(sql:String) =>
       val statement = connection.createStatement()
-      sender ! statement.executeUpdate(s.statement) // Int
+      sender ! statement.executeUpdate(sql) // Int
       statement.close()
-      log.info(s"Update('${s.statement}') completed" )
+      log.info(s"Update('$sql') completed" )
     case Status => sender ! self.path.name
     case x => log.error(s"Invalid message type in PoolActor: ${x.getClass}")
   }

@@ -24,7 +24,7 @@ class PoolTest extends FunSpec {
       val size = 5
       val actorSystem = ActorSystem("DbPool")
       val test = DbPool(actorSystem, size, db)
-      val futures = for (i ← 1 to 2 * size) yield test ? Status
+      val futures = for (i ← 1 to size) yield test ? Status
 
       val s = collection.mutable.Set[String]()
       for (f <- futures) {

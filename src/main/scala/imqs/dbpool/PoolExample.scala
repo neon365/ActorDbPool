@@ -34,7 +34,7 @@ object PoolExample extends App {
       println("Query failed: " + error)
     case _ => println("Unknown type received")
   }
-
+  
   println("Pool request dispatched")
   Thread.sleep(1000)
   system.shutdown()
